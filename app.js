@@ -10,6 +10,11 @@ app.get("/" , (req , res)=> {
     res.send("Hello from server");
 })
 
+app.post("/register/" , (req , res)=> {
+    const {email} = req.body;
+    res.status(200).send({sentEmail : email})
+})
+
 
 app.listen(port , ()=> {
     console.log(`Server started at http://localhost:${port}`);
