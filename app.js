@@ -1,4 +1,5 @@
 const {startScraping} = require("./scraper")
+const calculate = require("./logic")
 const express = require("express");
 // const serverless = require("serverless-http");
 const cors = require("cors");
@@ -15,7 +16,8 @@ let listOfArticles = []
 
 
 app.get("/" , (req , res)=> {
-    res.send("Hello, from render");
+    const val = calculate(10 , 20);
+    res.send({msg : "hello from render" , calcValue : val});
 })
 
 app.get("/:id/" , (req , res)=> {
