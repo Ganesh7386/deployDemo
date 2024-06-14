@@ -13,6 +13,11 @@ app.use(express.json())
 
 let listOfArticles = []
 
+
+app.get("/" , (req , res)=> {
+    res.send("Hello, from render");
+})
+
 app.get("/:id/" , (req , res)=> {
     const {id} = req.params;
     console.log(id)
