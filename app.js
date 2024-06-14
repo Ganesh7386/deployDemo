@@ -13,12 +13,14 @@ app.use(express.json())
 
 let listOfArticles = []
 
-// app.get("/:id/" , (req , res)=> {
-//     const {id} = req.params;
-//     console.log(id)
+app.get("/:id/" , (req , res)=> {
+    const {id} = req.params;
+    console.log(id)
 
-//     res.status(200).json({givenId : id})
-// })
+    res.status(200).json({givenId : id})
+})
+
+
 
 app.post("/scrape/" , async (req , res)=> {
     console.log(req.body);
