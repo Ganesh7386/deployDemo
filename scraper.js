@@ -2,54 +2,16 @@ const puppeteer = require("puppeteer")
 const {v4 : uuidv4} = require("uuid"); 
 
 
-function getDateTimeOfPublish(datetimeString) {
-    let parts = datetimeString.split(" ");
-    let unit = parts[1];
-    let nums = parseInt(parts[0]);
-    
-    let presentDateTime = new Date();
-
-    switch(unit) {
-        case 'days':
-        case 'day':
-            const daysToSubtract = nums;
-            //console.log("It is day");
-            presentDateTime.setDate(presentDateTime.getDate() - daysToSubtract);
-            break;
-        case 'hours':
-        case 'hour':
-            const hoursToSubtract = nums;
-            //console.log("It is hours");
-            presentDateTime.setHours(presentDateTime.getHours() - hoursToSubtract);
-            break;
-        case 'months':
-        case 'month' :
-            const monthsToSubtract = nums;
-            //console.log("it is month")
-            presentDateTime.setMonth(presentDateTime.getMonth()-monthsToSubtract);
-        default:
-            console.log("Modified");
-    }
-    //console.log('Date and Time after modification:', presentDateTime);
-    const day = presentDateTime.getDate();
-    const month = presentDateTime.getMonth();
-    const year  = presentDateTime.getFullYear();
-    const hours = presentDateTime.getHours();
-    const minutes = presentDateTime.getMinutes();
-    const seconds = presentDateTime.getMinutes()
-    const formattedDateTime = `${day}-${month}-${year}, ${hours}:${minutes}:${seconds}`;
-    // console.log(formattedDateTime)
-
-    return formattedDateTime;
-}
-
 
 const startScraping = async (searchValue)=> {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     // console.log(browser)
     console.log("browser launched")
     const page = await browser.newPage();
-    await page.goto(`https://medium.com/search?q=${searchValue}`);
+    await page.goto(`https://medium.com/search?q=${searchValue}` ,  { waitUntil: 'networkidle2' });
     let scrapedDataList = []
 
     try {
@@ -57,8 +19,9 @@ const startScraping = async (searchValue)=> {
             async page.$$() retrieves all article tags
         */
         const allArticleElements = await page.$$('article');
-        for(let eachArticle of allArticleElements) {
+        for(let i=0;i<allArticleElements.length - 2; i++) {
             let eachArticleInfoObj = {}
+            let eachArticle = allArticleElements[i];
             /*
                 async eachArticle.$() retireves pragraph element
                 page.evaluate() is for extracting text Content present in Paragraph element
@@ -88,21 +51,30 @@ const startScraping = async (searchValue)=> {
                 I have used child tag selectors to navigate to the element , where published date is stored
                 due to usage of this much hierarchy tracing , some times it fails and returns error , but retrying again from forntend side , it could get results
             */
+            console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            try {
+                await eachArticle.waitForSelector("div > div > div > div > div > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > a > span > div");
+            }
+            catch(e) {
+                console.log(e.message);
+            }
+            
             const mainCont = await eachArticle.$("div > div > div > div > div > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > a > span > div");
-            const mainContSelector = "div > div > div > div > div > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > a > span > div";
-            await page.waitForSelector(mainContSelector);
-            // waitForSelector is used to make control to wait untill document element is getting loaded
-
-            const delayText = await mainCont.getProperty('innerText')
-            const text = await delayText.jsonValue();
-            // text is a jsHandle object , which stored two values like "2min read" and "2 day ago" for each artcle element
-            const parts = text.split('\n').map(part => part.trim());
-            // console.log(parts)
-            const filteredList = parts.filter((eachText)=>(!eachText.includes(".")))
-            const postedAgo = filteredList[filteredList.length - 1];
-            const calculatedPostedDate = getDateTimeOfPublish(postedAgo)
-
-
+            // console.log(mainCont)
+            let calculatedPostedDate;
+            const allSpans = await mainCont.getProperty('innerText')
+            const reqText = await allSpans.jsonValue();
+            const reqTextsList = reqText.split("\n");
+            if(reqTextsList.length === 4) {
+                console.log(`${reqTextsList[1]} ${reqTextsList[3]}`)
+                calculatedPostedDate = reqTextsList[3];
+            }
+            else if(reqTextsList.length === 3) {
+                console.log(`${reqTextsList[0]} ${reqTextsList[2]}`)
+                calculatedPostedDate = reqTextsList[2];
+            }
+            // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            
             // const dayAgoPart = parts.find(part => part.includes('day ago'));
 
             // below await eachArticle.$('div[data-href]') is used for getting container which has dats-href attribute to get navigation links to actual website
@@ -111,7 +83,7 @@ const startScraping = async (searchValue)=> {
             const linkValue = await dataHrefValue.jsonValue();
 
             // all vallues like authorName , title , publicationDate , navigationLinks , profile imageurls of author are stores in an object
-            eachArticleInfoObj = {"id" : uuidv4() ,"authorName" : authorNameText , "title" : highlightTextContent , "publicationDate" : calculatedPostedDate , "navigationLink" : linkValue , "profileImgUrl" : extractedProfileImgUrl};
+            eachArticleInfoObj = {"id" : uuidv4() ,"authorName" : authorNameText , "title" : highlightTextContent , "navigationLink" : linkValue , "profileImgUrl" : extractedProfileImgUrl , "postedDetails" : calculatedPostedDate};
             console.log(eachArticleInfoObj)
             scrapedDataList.push(eachArticleInfoObj)
 
@@ -133,8 +105,8 @@ const startScraping = async (searchValue)=> {
 }
 
 
-/*
-// obtainedScrapedDataList = startScraping("machine learning")
+
+// obtainedScrapedDataList = startScraping("mern stack future trends");
 // console.log(obtainedScrapedDataList)
 
 
@@ -142,7 +114,6 @@ const startScraping = async (searchValue)=> {
 // getDateTimeOfPublish("3 hours ago");
 // getDateTimeOfPublish("3 months ago");
 
-*/
 
 module.exports = {startScraping}
 // startScraping function is exported

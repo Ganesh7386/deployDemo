@@ -1,5 +1,6 @@
 const {startScraping} = require("./scraper")
-const calculate = require("./logic")
+const puppeteer = require("puppeteer")
+const {v4 : uuidv4} = require("uuid"); 
 const express = require("express");
 // const serverless = require("serverless-http");
 const cors = require("cors");
@@ -13,6 +14,9 @@ app.use(bodyParser.json())
 app.use(express.json())
 
 let listOfArticles = []
+
+
+
 
 
 app.get("/" , (req , res)=> {
