@@ -1,6 +1,7 @@
 const {startScraping} = require("./scraper")
 const puppeteer = require("puppeteer")
 const {v4 : uuidv4} = require("uuid"); 
+const calculate = require("./logic")
 const express = require("express");
 // const serverless = require("serverless-http");
 const cors = require("cors");
@@ -20,7 +21,7 @@ let listOfArticles = []
 
 
 app.get("/" , (req , res)=> {
-    const val = calculate(10 , 20);
+    const val = calculate(20 , 20);
     res.send({msg : "hello from render" , calcValue : val});
 })
 
