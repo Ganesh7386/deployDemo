@@ -15,13 +15,16 @@ const buildConnectionWithDb = ()=> {
     const db_user = process.env.DB_USER;
     const db_password = process.env.DB_PASS;
     const db_name = process.env.DB_NAME;
+    console.log(db_host);
+    console.log(db_user);
+    console.log(db_password);
+    console.log(db_name);
     connection = mysql.createConnection({
         host : db_host,
         user : db_user,
         password : db_password,
         database : db_name
     })
-
 
     connection.connect((err)=> {
         if(err) {
