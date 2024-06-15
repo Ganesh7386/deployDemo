@@ -11,6 +11,7 @@ const startScraping = async (searchValue)=> {
     // console.log(browser)
     console.log("browser launched")
     const page = await browser.newPage();
+    await page.setRequestInterception(true);
     await page.goto(`https://medium.com/search?q=${searchValue}` ,  { waitUntil: 'networkidle2' });
     let scrapedDataList = []
 

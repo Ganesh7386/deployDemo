@@ -1,11 +1,11 @@
 const {startScraping} = require("./scraper")
-const puppeteer = require("puppeteer")
-const {v4 : uuidv4} = require("uuid"); 
-const calculate = require("./logic")
 const express = require("express");
+require("dotenv").config();
 // const serverless = require("serverless-http");
 const cors = require("cors");
 var bodyParser = require('body-parser')
+
+const {buildConnectionWithDb} = require("./dbConnection")
 
 app = express()
 const port = process.env.port || 5000
@@ -14,15 +14,16 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(express.json())
 
-let listOfArticles = []
 
+
+let connection  = buildConnectionWithDb();
+console.log(connection);
 
 
 
 
 app.get("/" , (req , res)=> {
-    const val = calculate(20 , 20);
-    res.send({msg : "hello from render" , calcValue : val});
+    res.send({msg : "hello from render" , calcValue : 10000});
 })
 
 app.get("/:id/" , (req , res)=> {
@@ -30,6 +31,23 @@ app.get("/:id/" , (req , res)=> {
     console.log(id)
 
     res.status(200).json({givenId : id})
+})
+
+app.get("/user/:userId/" , (req , res)=> {
+    const {userId} = req.params;
+    const userQuery = `select * from customersall where customer_id = ?`;
+    connection.query(userQuery , [userId] , (err , results)=> {
+        if(err) {
+            res.status(401).send({ok : false , error_msg : "db error"});
+        }
+        console.log(results);
+        if(results.length === 0) {
+            res.status(400).send({ok : false , error_msg : "no user found"});
+        }
+        else {
+            res.status(200).json({ok : true , data : results[0]});
+        }
+    })
 })
 
 
