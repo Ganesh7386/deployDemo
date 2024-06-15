@@ -1,8 +1,8 @@
 const {startScraping} = require("./scraper")
 const express = require("express");
 const dotenv = require("dotenv");
-const {getConnect} = require("./dbConnection")
-const {client , connectToMongo} = require("./dbConnection")
+// const {getConnect} = require("./mongoDbConnection")
+const {client , connectToMongo} = require("./dbsConnection/mongoDbConnection")
 dotenv.config();
 // const serverless = require("serverless-http");
 const cors = require("cors");
