@@ -1,6 +1,7 @@
 const {startScraping} = require("./scraper")
 const express = require("express");
-require("dotenv").config();
+const dotenv = require("dotenv");
+dotenv.config();
 // const serverless = require("serverless-http");
 const cors = require("cors");
 var bodyParser = require('body-parser')

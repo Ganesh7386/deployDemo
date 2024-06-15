@@ -1,19 +1,25 @@
 const mysql = require("mysql2");
-require("dotenv").config();
+const dotenv = require("dotenv");
+dotenv.config();
 
-console.log(process.env.DB_HOST);
-console.log(process.env.DB_USER)
-console.log(process.env.DB_PASS)
-console.log(process.env.DB_PASS);
+// console.log(process.env.DB_HOST);
+// console.log(process.env.DB_USER)
+// console.log(process.env.DB_PASS)
+// console.log(process.env.DB_NAME);
+
 
 
 const buildConnectionWithDb = ()=> {
     let connection;
+    const db_host = process.env.DB_HOST;
+    const db_user = process.env.DB_USER;
+    const db_password = process.env.DB_PASS;
+    const db_name = process.env.DB_NAME;
     connection = mysql.createConnection({
-        host : process.env.DB_HOST,
-        user : process.env.DB_USER,
-        password : process.env.DB_PASS,
-        database : process.env.DB_NAME
+        host : db_host,
+        user : db_user,
+        password : db_password,
+        database : db_name
     })
 
 
