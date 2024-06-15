@@ -6,7 +6,7 @@ dotenv.config();
 const cors = require("cors");
 var bodyParser = require('body-parser')
 
-const {buildConnectionWithDb} = require("./dbConnection")
+const {connectToDb} = require("./dbConnection")
 
 app = express()
 const port = process.env.port || 5000
@@ -17,8 +17,8 @@ app.use(express.json())
 
 
 
-let connection  = buildConnectionWithDb();
-console.log(connection);
+let pool  = connectToDb();
+console.log(pool);
 
 
 
@@ -34,7 +34,9 @@ app.get("/:id/" , (req , res)=> {
     res.status(200).json({givenId : id})
 })
 
-app.get("/user/:userId/" , (req , res)=> {
+
+/*
+app.get("/user/:userId/" , async (req , res)=> {
     const {userId} = req.params;
     const userQuery = `select * from customersall where customer_id = ?`;
     connection.query(userQuery , [userId] , (err , results)=> {
@@ -49,14 +51,28 @@ app.get("/user/:userId/" , (req , res)=> {
             res.status(200).json({ok : true , data : results[0]});
         }
     })
+})  */
+
+app.get("/users/:userId/" ,async (req , res)=> {
+    const {userId} = req.params;
+    try {
+        const result  = await pool.query(`select * from customersall where customer_id = ?` , [userId]);
+        console.log(result);
+        console.log(result[0]);
+        res.send({ok : true , data : result[0]});
+    }
+    catch(e) {
+        console.log(e.message);
+        res.send({ok : false , errorMsg : "server error"});
+    }
+    
 })
 
 
-
 app.post("/scrape/" , async (req , res)=> {
-    console.log(req.body);
+    // console.log(req.body);
     const {prompt} = req.body;
-    console.log(prompt)
+    // console.log(prompt)
     try {
         const resultsList = await startScraping(prompt);
         if(resultsList.ok) {

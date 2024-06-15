@@ -7,7 +7,40 @@ dotenv.config();
 // console.log(process.env.DB_PASS)
 // console.log(process.env.DB_NAME);
 
+const connectToDb = ()=> {
+    pool = mysql.createPool({
+        host : process.env.DB_HOST,
+        user : process.env.DB_USER,
+        password : process.env.DB_PASS,
+        database : process.env.DB_NAME,
+        waitForConnections : true,
+        connectionLimit : 10,
+        queueLimit : 0
+    })
+    
+    pool.getConnection((err)=> {
+    if(err) {
+        console.log("an error occured in pool connection");
+    }
+    else {
+        console.log("successfully connected to pool connection");
+    }
+    })
 
+    // console.log("&&&&&&&&&&&&");
+    // console.log(pool);
+    // console.log("%%%%%%%%%%%%%%%%");
+    // console.log(pool.promise);
+    // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+    return pool.promise();
+}
+ 
+
+
+
+
+/*
 
 const buildConnectionWithDb = ()=> {
     let connection;
@@ -42,4 +75,9 @@ const buildConnectionWithDb = ()=> {
 }
 
 
-module.exports = {buildConnectionWithDb};
+*/
+
+
+// module.exports = {buildConnectionWithDb};
+
+module.exports = {connectToDb}
