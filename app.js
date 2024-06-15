@@ -1,12 +1,13 @@
 const {startScraping} = require("./scraper")
 const express = require("express");
 const dotenv = require("dotenv");
+const {getConnect} = require("./dbConnection")
+const {client , connectToMongo} = require("./dbConnection")
 dotenv.config();
 // const serverless = require("serverless-http");
 const cors = require("cors");
 var bodyParser = require('body-parser')
 
-const {connectToDb} = require("./dbConnection")
 
 app = express()
 const port = process.env.port || 5000
@@ -16,15 +17,39 @@ app.use(bodyParser.json())
 app.use(express.json())
 
 
+const connectToMongoCluster = async ()=> {
 
-let pool  = connectToDb();
-console.log(pool);
+    try {
+    await connectToMongo();
+    } catch(e) {
+        console.log(e.message);
+    }
+    
+}
 
+connectToMongoCluster()
+console.log("after connection");
 
 
 
 app.get("/" , (req , res)=> {
     res.send({msg : "hello from vercel , render" , calcValue : 10000});
+})
+
+app.get("/user/" , async (req , res)=> {
+
+    try {
+    const transportDb = await client.db('transport');
+    const usersCollection = await transportDb.collection('users');
+    const user1 = await usersCollection.findOne({name : 'bharath'});
+
+    res.send({ok : true , data : user1});
+
+    }
+    catch(e) {
+        console.log(e.message);
+        res.send({ok : false , error_msg : "error occured in db"});
+    }
 })
 
 app.get("/:id/" , (req , res)=> {
