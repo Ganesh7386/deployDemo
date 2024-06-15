@@ -11,5 +11,12 @@
             "src" : "/(.*)",
             "dest" : "app.js"
         }
-    ]
+    ],
+    "env" : {
+        "DB_HOST": "localhost",
+        "DB_USER": "root",
+        "DB_PASS": "2002@gansaiesh",
+        "DB_NAME": "ecommerce"
+    }
 }
+
