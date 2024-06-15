@@ -33,7 +33,7 @@ console.log("after connection");
 
 
 app.get("/" , (req , res)=> {
-    res.send({msg : "hello from vercel , render" , calcValue : 10000});
+    res.send({msg : "hello from vercel , render and mongodb" , calcValue : 10000});
 })
 
 app.get("/user/" , async (req , res)=> {
