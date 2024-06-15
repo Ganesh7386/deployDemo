@@ -24,7 +24,7 @@ console.log(pool);
 
 
 app.get("/" , (req , res)=> {
-    res.send({msg : "hello from render" , calcValue : 10000});
+    res.send({msg : "hello from vercel , render" , calcValue : 10000});
 })
 
 app.get("/:id/" , (req , res)=> {
