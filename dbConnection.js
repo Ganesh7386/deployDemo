@@ -11,19 +11,19 @@ dotenv.config();
 
 const buildConnectionWithDb = ()=> {
     let connection;
-    const db_host = process.env.DB_HOST;
-    const db_user = process.env.DB_USER;
-    const db_password = process.env.DB_PASS;
-    const db_name = process.env.DB_NAME;
-    console.log(db_host);
-    console.log(db_user);
-    console.log(db_password);
-    console.log(db_name);
+    //const db_host = process.env.DB_HOST;
+    //const db_user = process.env.DB_USER;
+    //const db_password = process.env.DB_PASS;
+    //const db_name = process.env.DB_NAME;
+    // console.log(db_host);
+    // console.log(db_user);
+    // console.log(db_password);
+    // console.log(db_name);
     connection = mysql.createConnection({
-        host : db_host,
-        user : db_user,
-        password : db_password,
-        database : db_name
+        host : "localhost",
+        user : "root",
+        password : "2002@gansaiesh",
+        database : "ecommerce"
     })
 
     connection.connect((err)=> {
