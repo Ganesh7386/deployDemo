@@ -21,6 +21,7 @@ const connectToMongoCluster = async ()=> {
 
     try {
     await connectToMongo();
+
     } catch(e) {
         console.log(e.message);
     }
@@ -34,6 +35,21 @@ console.log("after connection");
 
 app.get("/" , (req , res)=> {
     res.send({msg : "hello from vercel , render and mongodb" , calcValue : 10000});
+})
+
+app.post("/register/" , async (req , res)=> {
+    const {name , email} = req.body;
+    try {
+        const transportDb = await client.db('transport');
+        const usersCollection = await transportDb.collection('users');
+        const insertResponse = await usersCollection.insertOne({name ,  email});
+        console.log(insertResponse);
+        res.status(200).json({ok : true , msg : insertResponse});
+    }
+    catch(e) {
+        console.log(e.message);
+        res.status(400).json({ok : false , error_msg : e.message});
+    }
 })
 
 app.get("/user/" , async (req , res)=> {
